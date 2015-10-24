@@ -27,35 +27,35 @@ class TrifinitySuite extends FunSuite {
   }
 
 
-  test("Afer a join the board should be size 2") {
+  test("After a join the board should be size 2") {
     assert(StartTrifinity.join(Player("one")).size == 2 )
   }
 
-  test("Afer a first join it is the players turn") {
+  test("After a first join it is the players turn") {
     val player = Player("one")
     assert(StartTrifinity.join(player).turn == player )
   }
 
-  test("Afer two joins it is the first players turn") {
+  test("After two joins it is the first players turn") {
     val player1 = Player("one")
     val player2 = Player("two")
     assert(StartTrifinity.join(player1).join(player2).turn == player1 )
   }
 
-  test("Afer two joins and a set it is the second players turn") {
+  test("After two joins and a set it is the second players turn") {
     val player1 = Player("one")
     val player2 = Player("two")
     assert(StartTrifinity.join(player1).join(player2).set(0,0).turn == player2 )
   }
 
-  test("Afer two joins and two sets it is the first players turn") {
+  test("After two joins and two sets it is the first players turn") {
     val player1 = Player("one")
     val player2 = Player("two")
     assert(StartTrifinity.join(player1).join(player2).set(0,0).set(1,0).turn == player1 )
   }
 
 
-  test("Afer a join and a move the get should return the player") {
+  test("After a join and a move the get should return the player") {
     val player = Player("one")
     val start = StartTrifinity.join(player)
     val game = start.set(0, 0)
@@ -65,14 +65,14 @@ class TrifinitySuite extends FunSuite {
     assert(game.get(1,1) == EmptyPlayer)
   }
 
-  test("Afer a join and 2 moves the winner should be player") {
+  test("After a join and 2 moves the winner should be player") {
     val player = Player("one")
     val game = StartTrifinity.join(player).set(0, 0).set(0, 1)
     assert(game.winner.size == 1)
     assert(game.winner.head == player)
   }
 
-  test("Afer two joins and 2 moves there should be no winner ") {
+  test("After two joins and 2 moves there should be no winner ") {
     val playerOne = Player("one")
     val playerTwo = Player("two")
     val game = StartTrifinity.join(playerOne).join(playerTwo).set(0, 0).set(0, 1)
