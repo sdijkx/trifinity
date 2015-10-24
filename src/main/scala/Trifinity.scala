@@ -17,14 +17,10 @@ case class Trifinity(players:Seq[Player],get:(Int,Int) => Player) {
   def size:Int = players.size + 1
   def winner:Seq[Player] = solutions.map(seq => playerHasAWinningCombo(seq)).filter( _ != EmptyPlayer)
 
-
   def playerHasAWinningCombo(seq:Seq[Player]):Player = seq.distinct match {
-    case xs if xs.contains(EmptyPlayer) => EmptyPlayer
     case xs if xs.size == 1 => xs.head
     case _ => EmptyPlayer
   }
-
-
 
   def solutions:Seq[Seq[Player]] =
     (for(i <- 0 to size ) yield  range( (i, _) )) ++ //rows
