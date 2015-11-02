@@ -1,0 +1,33 @@
+<section>
+  <h1>Trinfinity Tic Tact Toe</h1>
+  <div class="error">{{errorMessage}}</div>
+  <div>{{notificationMessage}}</div>
+  <div>
+        <input ng-model="model.player" />
+        <button ng-click="sendJoinCmd()">Join</button>        
+  </div>
+  
+  <tri-board />
+</section>
+<section>
+    <button ng-click="sendLeaveCmd()">Leave</button>
+    <button ng-click="sendNewGameCmd()">New game</button>
+</section>
+<section>
+    <div>{{players.turn}}</div>
+</section>
+
+    
+<section>
+  <h1>Players</h1>
+  <ul ng-repeat="player in players.current track by $index">
+      <li>{{player}}</li>
+  </ul>
+</section>
+
+<section>
+  <h1>Winner is {{winner}}</h1>
+</section>
+
+
+

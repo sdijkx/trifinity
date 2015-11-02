@@ -6,8 +6,8 @@ import org.scalatest.FunSuite
 class RxTrifinity extends FunSuite {
 
   test("a test") {
-    val gamer1 = Gamer("id1","one")
-    val gamer2 = Gamer("id2","two")
+    val gamer1 = GameEventSubject("id1","one")
+    val gamer2 = GameEventSubject("id2","two")
 
 
 

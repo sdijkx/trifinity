@@ -1,0 +1,7 @@
+<table class="board">
+    <tr class="row" ng-repeat="(rowkey,row) in cells">
+        <td class="cell" ng-repeat="(cellkey,cell) in row" ng-click="move(rowkey,cellkey)">
+            {{cell[0]}}
+        </td>
+    </tr>
+</table>

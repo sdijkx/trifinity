@@ -12,7 +12,20 @@ case class Trifinity(players:Seq[Player],get:(Int,Int) => Player) {
       case _ => get(mx,my)
     })
   }
-  def join(player:Player):Trifinity = Trifinity(players :+ player, get)
+  def join(player:Player):Trifinity = {
+    require(players forall {p => p.name != player.name })
+    Trifinity(players :+ player, get)
+  }
+
+  def leave(player:Player):Trifinity = {
+    require(players exists {p => p.name == player.name })
+    Trifinity(players.filter(p => p.name != player.name), get)
+  }
+
+  def gameIsFinished:Boolean = noMoreMoves || hasWinner
+  def noMoreMoves:Boolean = solutions.flatMap(p => p).forall( _ != EmptyPlayer )
+  def hasWinner:Boolean = !winner.isEmpty
+
   def turn:Player = if(players.isEmpty) EmptyPlayer else players.head
   def size:Int = players.size + 1
   def winner:Seq[Player] = solutions.map(seq => playerHasAWinningCombo(seq)).filter( _ != EmptyPlayer)
