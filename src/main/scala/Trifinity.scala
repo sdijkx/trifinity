@@ -3,7 +3,7 @@ import TrifinityExt._
 case class Trifinity(players:Seq[Player],get:(Int,Int) => Player) {
 
   def set(x:Int, y: Int):Trifinity = {
-    require(players.size > 0)
+    require(players.nonEmpty)
     require(x >= 0 && x < size && y >= 0 && y < size)
     require(get(x,y) == EmptyPlayer)
     val player = turn
@@ -23,8 +23,8 @@ case class Trifinity(players:Seq[Player],get:(Int,Int) => Player) {
   }
 
   def gameIsFinished:Boolean = noMoreMoves || hasWinner
-  def noMoreMoves:Boolean = solutions.flatMap(p => p).forall( _ != EmptyPlayer )
-  def hasWinner:Boolean = !winner.isEmpty
+  def noMoreMoves:Boolean = !solutions.flatMap(p => p).contains(EmptyPlayer)
+  def hasWinner:Boolean = winner.nonEmpty
 
   def turn:Player = if(players.isEmpty) EmptyPlayer else players.head
   def size:Int = players.size + 1
@@ -36,13 +36,13 @@ case class Trifinity(players:Seq[Player],get:(Int,Int) => Player) {
   }
 
   def solutions:Seq[Seq[Player]] =
-    (for(i <- 0 to size ) yield  range( (i, _) )) ++ //rows
-    (for(i <- 0 to size ) yield  range( (_, i) )) :+ //columns
-    range(i => (i , i)) :+ //diagonal
-    range(i => (size - 1 - i , i)) //reverse diagonal
+    (for(r <- 0 to size ) yield  range( (r, _) )) ++ //rows
+    (for(c <- 0 to size ) yield  range( (_, c) )) :+ //columns
+    range(n => (n , n)) :+ //diagonal
+    range(n => (size - 1 - n , n)) //reverse diagonal
 
 
-  def range(f:Int => (Int, Int)) = TrifinityExt.range[(Int,Int),Player](f, (c:(Int,Int)) => get(c._1,c._2) ).take(size)
+  def range(f:Int => (Int, Int)):Stream[Player] = TrifinityExt.range[(Int,Int),Player](f, (c:(Int,Int)) => get(c._1,c._2) ).take(size)
 }
 
 object StartTrifinity extends Trifinity(Seq.empty, (x:Int, y:Int) => EmptyPlayer )

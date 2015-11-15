@@ -5,8 +5,11 @@ import akka.http.scaladsl.model.{HttpMethods, Uri, HttpResponse, HttpRequest}
 import akka.stream.{ActorMaterializer}
 import akka.stream.actor.{ActorPublisher}
 import akka.stream.scaladsl.{Source, Sink, Flow}
-import play.api.libs.json.{JsString, JsObject}
+import play.api.libs.json.{Json, JsString, JsObject}
 import rx.lang.scala.Observer
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
+
 
 
 object WebserviceApp extends App {
@@ -22,7 +25,20 @@ object WebserviceApp extends App {
     case HttpRequest(HttpMethods.GET,Uri.Path("/trifinity"),_,_,_)
       if request.header[UpgradeToWebsocket].isDefined =>
         request.header[UpgradeToWebsocket].get.handleMessages(flow)
+
+    case HttpRequest(HttpMethods.GET,Uri.Path("/webcam"),_,_,_)
+      if request.header[UpgradeToWebsocket].isDefined =>
+      request.header[UpgradeToWebsocket].get.handleMessages(webcamFlow)
+
     case _ => HttpResponse(200, entity = "Hallo")
+  }
+
+  //Webcam flow
+  def webcamFlow:Flow[Message, Message, Unit] = {
+    val publisher = system.actorOf(Props[WsWebcamPublisher])
+    val source = Source(ActorPublisher[Message](publisher))
+    val sink = Sink.ignore
+    Flow.wrap(sink,source)((_,_) => ())
   }
 
   //Websocket flow
@@ -33,7 +49,7 @@ object WebserviceApp extends App {
     val gamer = GameEventSubject()
     trifinity.observe(gamer.observable)
 
-    val subscription = trifinity.observable.subscribe(
+    trifinity.observable.subscribe(
       trifinity => publisher ! TrifinityExt.toJson(trifinity),
       e => publisher ! JsObject(Seq(("error", JsString(e.getMessage)))),
       () => publisher ! JsObject(Seq(("complete", TrifinityExt.toJson(trifinity.trifinity))))
@@ -82,3 +98,17 @@ class WsPublisher extends ActorPublisher[Message] {
     }
   }
 }
+
+class WsWebcamPublisher extends ActorPublisher[Message] {
+
+  implicit val system = ActorSystem("trifinity")
+  val webcam = system.actorOf(Props[WebcamStream])
+  context.system.scheduler.schedule(0 seconds, 200 milli, webcam, GetImage)
+
+  override def receive: Receive = {
+    case image:Image => if(isActive && totalDemand > 0) {
+      onNext(TextMessage.Strict(image.toJson()))
+    }
+  }
+}
+
